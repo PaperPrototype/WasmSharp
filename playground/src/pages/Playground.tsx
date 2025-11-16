@@ -12,6 +12,8 @@ import { spacing } from "../themeUtils.js";
 import * as styles from "./Playground.css";
 
 const Playground: Component = () => {
+  let canvasRef: HTMLCanvasElement | undefined;
+
   const wasmSharpOptions: WasmSharpOptions = {
     enableDiagnosticTracing: import.meta.env.DEV,
     onConfigLoaded(config) {
@@ -26,6 +28,8 @@ const Playground: Component = () => {
       });
     },
     debugLevel: 1,
+    disableWebWorker: true,
+    canvas: () => canvasRef,
   };
 
   const context = WasmSharpModule.initializeAsync(wasmSharpOptions);
@@ -47,6 +51,9 @@ const Playground: Component = () => {
       <TwoPaneView separatorStyle={styles.separator}>
         <CodeMirrorEditor onValueChanged={onValueChanged} wasmSharpModule={context} />
         <div>
+          <div>
+            <canvas ref={canvasRef} style={{height: "400px", width: "400px"}}></canvas>
+          </div>
           <Show when={wasmSharpModule.state === "pending"}>
             <h2 style={{ "margin-left": spacing(3) }}>Loading compilation tools, please wait...</h2>
           </Show>

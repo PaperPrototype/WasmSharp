@@ -31,7 +31,7 @@ export async function initializeWasmSharpModule(
 
   const time = performance.now();
   let resourcesToLoad = 0;
-  const { getAssemblyExports, getConfig } = await hostBuilder
+  const { getAssemblyExports, getConfig, setModuleImports } = await hostBuilder
     .withModuleConfig({
       onConfigLoaded(config: MonoConfig) {
         resourcesToLoad = Object.keys(config.resources?.assembly ?? {}).length;
@@ -57,6 +57,56 @@ export async function initializeWasmSharpModule(
     })
     .create();
 
+  // force code to await for the canvas lazy value to be valid
+  // then call setModuleImports
+  function delay(ms: number) {
+    return new Promise((res) => setTimeout(res, ms));
+  }
+
+  async function waitForCanvas(provider: any): Promise<any> {
+    while (true) {
+      try {
+        console.log("inside of waitForCanvas")
+        const candidate = typeof provider === "function" ? await provider() : provider;
+        if (candidate instanceof HTMLCanvasElement) return candidate;
+        // if other truthy canvas-like objects should be accepted, adjust this check
+        if (candidate) return candidate;
+      } catch {
+        // ignore and retry
+      }
+      await delay(50);
+    }
+  }
+
+  console.log("before waitForCanvas")
+
+  const canvasProvider = options?.canvas ? () => waitForCanvas(options!.canvas) : undefined;
+
+  if (!canvasProvider) {
+    throw new Error("WasmSharp: no canvas provider configured");
+  }
+
+  console.log("before context2DProvider")
+
+  const context2DProvider = canvasProvider
+    ? async () => {
+        const canvas = await canvasProvider() as HTMLCanvasElement;
+        return canvas!.getContext("2d");
+      }
+    : undefined;
+
+  if (!context2DProvider) {
+    throw new Error("WasmSharp: no context2D provider configured");
+  }
+
+  if (context2DProvider) {
+    const context2D = await context2DProvider();
+    if (context2D) {
+      console.log("setModuleImports")
+      setModuleImports("context2D", context2D);
+    }
+  }
+
   const config = getConfig();
   console.log("WasmSharp: Config loaded", config);
   const assemblyExports: AssemblyExports = await getAssemblyExports(config.mainAssemblyName!);
@@ -71,6 +121,8 @@ export async function initializeWasmSharpModule(
   if (!resources) {
     throw new Error("WasmSharp: No resources found in config");
   }
+
+  console.log("RESOURCES", resources)
 
   if (!resources.assembly || !resources.coreAssembly || !resources.satelliteResources) {
     throw new Error("WasmSharp: config is malformed, no assemblies found");
@@ -91,6 +143,9 @@ export async function initializeWasmSharpModule(
       return !!x.resolvedUrl;
     })
     .map((x) => new URL(x.resolvedUrl!, resolvedAssembliesUrl).href);
+
+
+  console.log("ASSEMBLIES", assemblies)
 
   await compilationInterop.InitAsync(assemblies);
   const diff2 = performance.now() - time;

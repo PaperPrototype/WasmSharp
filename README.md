@@ -131,3 +131,23 @@ Building @wasmsharp/core, building the playground, and then previewing it has a 
 ```
 pnpm all
 ```
+
+### Base Program class
+```cs
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Your program logic goes here
+        Console.WriteLine("Hello from the static Main method!");
+
+        // Example of using command-line arguments
+        if (args.Length > 0)
+        {
+            Console.WriteLine($"First argument: {args[0]}");
+        }
+    }
+}
+```

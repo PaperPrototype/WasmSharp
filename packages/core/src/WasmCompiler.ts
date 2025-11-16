@@ -9,6 +9,7 @@ import type { CompilationInterop } from "./CompilationInterop.js";
 import { WellKnownTagArray } from "./Roslyn/WellKnownTags.js";
 
 export interface WasmSharpModuleOptions {
+  canvas: () => HTMLCanvasElement | undefined,
   /**
    * URL to resolve assemblies from.
    * @default import.meta.url

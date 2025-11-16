@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "pnpm start",
-    "init-playground-deps": "pnpm run build:core && pnpm run build:imports-plugin",
+    "init-playground-deps": "pnpm run build:core && pnpm run build:imports-plugin && pnpm run build:vite-plugin",
     "start": "pnpm --filter playground run start",
     "playground": "pnpm run start",
     "test": "pnpm --filter playground test",

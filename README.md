@@ -85,7 +85,7 @@ This project uses pnpm. Installation instructions for pnpm can be found [here](h
 pnpm i
 ```
 
-### Build all required depedencies to run the playground
+### Build all required depedencies to run the playground (C# project + vite plugins)
 ```
 pnpm init-playground-deps
 ```

@@ -1,15 +1,4 @@
 {
-  "version": 2,
-  "public": true,
-  "builds": [
-    {
-      "src": "playground/dist/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/playground/dist/index.html" }
-  ],
   "github": {
     "enabled": false
   }

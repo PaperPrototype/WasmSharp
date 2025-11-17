@@ -50,9 +50,19 @@ const Playground: Component = () => {
       </Show>
       <TwoPaneView separatorStyle={styles.separator}>
         <CodeMirrorEditor onValueChanged={onValueChanged} wasmSharpModule={context} />
-        <div>
-          <div>
-            <canvas ref={canvasRef} style={{height: "400px", width: "400px"}}></canvas>
+        <div style={{ 
+          display: "grid",
+          "grid-template-columns": "1fr",
+          "grid-template-rows": "1fr 1fr",
+          height: "100%",
+          width: "100%"
+        }}>
+          {/* 
+            Canvas will utilize the parent element to decide width/height 
+            see: handleResize in initializeWasmSharpModule.ts
+          */}
+          <div style={{position:"relative"}}>
+            <canvas ref={canvasRef} style={{position: "absolute", top: "0px", left: "0px", bottom: "0px", right: "0px"}}></canvas>
           </div>
           <Show when={wasmSharpModule.state === "pending"}>
             <h2 style={{ "margin-left": spacing(3) }}>Loading compilation tools, please wait...</h2>

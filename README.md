@@ -6,6 +6,20 @@ Compile and run C# programs locally from your web browser, no server necessary. 
 > [!NOTE]
 > This fork attempts to add support for drawing to a canvas using CanvasRenderingContext2D
 
+## Deploy to vercel
+
+```sh
+pnpm i
+pnpm init-playground-deps
+pnpm --filter playground build
+
+# then
+vercel build
+
+# then
+vercel deploy --prebuilt
+```
+
 ## Live demo
 
 https://wasmsharp.pages.dev/

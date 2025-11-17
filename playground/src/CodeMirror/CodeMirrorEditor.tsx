@@ -32,14 +32,139 @@ const CodeMirrorEditor: Component<CodeMirrorEditorProps> = (props) => {
   onMount(() => {
     const initialDocument = `using System;
 
-Console.WriteLine("Hello, world!");
+Console.WriteLine("Angry Bird is ready!");
 
-// Clear canvas from previous runs
-Context2D.Reset();
+var xPos = 400.0;
+var yPos = 300.0;
+var PI = 3.14159;
 
-// Intellisense can detect the API!
-Context2D.FillStyle("red");
-Context2D.FillRect(0, 0, 100, 100);`;
+Input.Update = (dt) => {
+  Context2D.Reset();
+  DrawAngryBird(xPos, yPos);
+};
+
+Input.MouseMove = (double x, double y) => {
+  xPos = x;
+  yPos = y;
+};
+
+void DrawAngryBird(double x, double y)
+{
+  var centerX = x;
+  var centerY = y;
+  
+  // Tail feathers (back, so draw first)
+  Context2D.FillStyle("#B71C1C");
+  // Top feather
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX - 35, centerY - 15);
+  Context2D.LineTo(centerX - 55, centerY - 20);
+  Context2D.LineTo(centerX - 40, centerY - 5);
+  Context2D.ClosePath();
+  Context2D.Fill();
+  
+  // Middle feather
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX - 38, centerY - 5);
+  Context2D.LineTo(centerX - 60, centerY - 5);
+  Context2D.LineTo(centerX - 42, centerY + 5);
+  Context2D.ClosePath();
+  Context2D.Fill();
+  
+  // Bottom feather
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX - 35, centerY + 5);
+  Context2D.LineTo(centerX - 55, centerY + 15);
+  Context2D.LineTo(centerX - 38, centerY + 15);
+  Context2D.ClosePath();
+  Context2D.Fill();
+  
+  // Body (red circle)
+  Context2D.FillStyle("#D32F2F");
+  Context2D.BeginPath();
+  DrawCircle(centerX, centerY, 40);
+  Context2D.Fill();
+  
+  // Belly (lighter red oval on the side)
+  Context2D.FillStyle("#E57373");
+  Context2D.BeginPath();
+  DrawEllipse(centerX + 5, centerY + 5, 20, 25);
+  Context2D.Fill();
+  
+  // Eye (white background) - single eye for side view
+  Context2D.FillStyle("white");
+  Context2D.BeginPath();
+  DrawCircle(centerX + 15, centerY - 10, 14);
+  Context2D.Fill();
+  
+  // Pupil (black)
+  Context2D.FillStyle("black");
+  Context2D.BeginPath();
+  DrawCircle(centerX + 18, centerY - 8, 6);
+  Context2D.Fill();
+  
+  // Angry eyebrow (single, angled down)
+  Context2D.FillStyle("black");
+  Context2D.LineWidth(4);
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX + 5, centerY - 22);
+  Context2D.LineTo(centerX + 25, centerY - 18);
+  Context2D.Stroke();
+  
+  // Beak (yellow/orange, pointing right)
+  Context2D.FillStyle("#FFA726");
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX + 25, centerY + 8);
+  Context2D.LineTo(centerX + 45, centerY + 10);
+  Context2D.LineTo(centerX + 25, centerY + 18);
+  Context2D.ClosePath();
+  Context2D.Fill();
+  
+  // Top part of beak (darker)
+  Context2D.FillStyle("#FF9800");
+  Context2D.BeginPath();
+  Context2D.MoveTo(centerX + 25, centerY + 8);
+  Context2D.LineTo(centerX + 45, centerY + 10);
+  Context2D.LineTo(centerX + 35, centerY + 13);
+  Context2D.ClosePath();
+  Context2D.Fill();
+}
+
+// Helper function to draw a circle using path
+void DrawCircle(double x, double y, double radius)
+{
+  var segments = 32;
+  for (int i = 0; i <= segments; i++)
+  {
+    var angle = (i / (double)segments) * PI * 2;
+    var px = x + Math.Cos(angle) * radius;
+    var py = y + Math.Sin(angle) * radius;
+    
+    if (i == 0)
+      Context2D.MoveTo(px, py);
+    else
+      Context2D.LineTo(px, py);
+  }
+  Context2D.ClosePath();
+}
+
+// Helper function to draw an ellipse
+void DrawEllipse(double x, double y, double radiusX, double radiusY)
+{
+  var segments = 32;
+  for (int i = 0; i <= segments; i++)
+  {
+    var angle = (i / (double)segments) * PI * 2;
+    var px = x + Math.Cos(angle) * radiusX;
+    var py = y + Math.Sin(angle) * radiusY;
+    
+    if (i == 0)
+      Context2D.MoveTo(px, py);
+    else
+      Context2D.LineTo(px, py);
+  }
+  Context2D.ClosePath();
+}`;
     const readUpdates = EditorView.updateListener.of((update) => {
       const document = update.state.doc.toString();
       props.onValueChanged?.(document);

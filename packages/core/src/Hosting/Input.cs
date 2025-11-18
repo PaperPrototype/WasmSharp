@@ -10,7 +10,9 @@ public static partial class Input
     public static Action<double>? Update;
     public static Action<double>? PixelRatio;
 
+    private static Vector2 _prevMouse = new Vector2();
     public static Vector2 Mouse = new Vector2();
+    public static Vector2 MouseDelta = new Vector2();
     public static double DevicePixelRatio = 1;
     public static double Width = 1;
     public static double Height = 1;
@@ -30,8 +32,13 @@ public static partial class Input
     [JSExport]
     internal static void CallMouseMove(double x, double y)
     {
+        _prevMouse.X = Mouse.X;
+        _prevMouse.Y = Mouse.Y;
+
         Mouse.X = (float)x;
         Mouse.Y = (float)y;
+
+        MouseDelta = Mouse - _prevMouse;
 
         MouseMove?.Invoke(x, y);
     }

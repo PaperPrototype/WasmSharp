@@ -29,6 +29,10 @@ var PI = 3.14159;
 
 Input.Update = (dt) => {
   Context2D.Reset();
+
+  // blue background
+  Context2D.FillStyle("#4287f5");
+  Context2D.FillRect(-100, -100, 10000, 10000);
   DrawAngryBird(xPos, yPos);
 };
 
@@ -156,9 +160,115 @@ void DrawEllipse(double x, double y, double radiusX, double radiusY)
 }`
     },
     {
-      id: "hello",
-      title: "Hello",
-      code: `using System;\n\nConsole.WriteLine("Hello from tab!");`
+      id: "readme",
+      title: "README",
+      code: `// Playground README - quick API examples
+
+using System;
+var PI = 3.14159;
+
+// These are short snippets demonstrating the Playground host API.
+// Copy any example into a tab and run it.
+
+// -------------------------
+// 1) Basic rectangle
+// -------------------------
+Context2D.Reset();
+Context2D.FillStyle("#3490de");
+Context2D.FillRect(10, 10, 120, 60);
+
+// -------------------------
+// 2) Path drawing (triangle)
+// -------------------------
+Context2D.BeginPath();
+Context2D.MoveTo(80, 30);
+Context2D.LineTo(30, 100);
+Context2D.LineTo(130, 100);
+Context2D.ClosePath();
+Context2D.FillStyle("#ffcc00");
+Context2D.Fill();
+
+// -------------------------
+// 3) Helper: draw a circle
+// -------------------------
+void DrawCircle(double x, double y, double radius)
+{
+  var segments = 32;
+  for (int i = 0; i <= segments; i++)
+  {
+    var angle = (i / (double)segments) * PI * 2;
+    var px = x + Math.Cos(angle) * radius;
+    var py = y + Math.Sin(angle) * radius;
+    if (i == 0)
+      Context2D.MoveTo(px, py);
+    else
+      Context2D.LineTo(px, py);
+  }
+  Context2D.ClosePath();
+}
+
+Context2D.BeginPath();
+DrawCircle(200, 60, 36);
+Context2D.FillStyle("#d32f2f");
+Context2D.Fill();
+
+// -------------------------
+// 4) Input callbacks and Update loop
+// -------------------------
+// The Update callback runs once per frame with a delta time.
+// IMPORTANT: When switching tabs, set Input.Update = null to stop prior loops.
+double xPos = 200.0;
+double yPos = 120.0;
+
+Input.MouseMove = (double mx, double my) => {
+  xPos = mx;
+  yPos = my;
+};
+
+Input.Update = (double deltaTimeSeconds) => {
+  // Clear previous frame
+  Context2D.Reset();
+
+  // Draw a moving circle at the mouse position
+  Context2D.BeginPath();
+  DrawCircle(xPos, yPos, 24);
+  Context2D.FillStyle("#4caf50");
+  Context2D.Fill();
+};
+
+// -------------------------
+// 5) Other hooks
+// -------------------------
+Input.MouseDown = (double mx, double my) => { /* handle mouse down */ };
+Input.MouseUp = (double mx, double my) => { /* handle mouse up */ };
+Input.Resize = (double w, double h) => { /* handle host resize */ };
+Input.PixelRatio = (double pr) => { /* handle device pixel ratio changes */ };
+
+// -------------------------
+// Final notes / edge cases
+// -------------------------
+// - Always clear previous frame/update before running, otherwise you'll run into
+//   an issue where an update you defined in another tab keeps running:
+//     Input.Update = null;
+// - You will need to clear the canvas at the beginning of each program or else previous 
+//   runs will not be cleared:
+//     Context2D.Reset();
+// - If you create timers or other async work in user code, make sure to cancel them
+//   before replacing the tab content to avoid background work continuing unexpectedly.
+// - At the moment Console output does not work work inside of Input callbacks like 
+//   Update or MouseMove.
+`
+    },
+    {
+      id: "helloworld",
+      title: "Hello World",
+      code: `using System;
+
+// Reset state from other tabs
+Input.Update = null;
+Context2D.Reset();
+
+Console.WriteLine("Hello world!");`
     }
   ];
 
@@ -295,7 +405,17 @@ void DrawEllipse(double x, double y, double radiusX, double radiusY)
     const newTab = {
       id: `tab-${Date.now()}`,
       title: `Untitled ${n}`,
-      code: `using System;\n\nContext2D.Reset();\n\nConsole.WriteLine("New Tab ${n}");`,
+      code: `using System;
+
+// Reset the update method
+Input.Update = (delaTime) => {};
+
+// Clear the canvas from any previous runs
+Context2D.Reset();
+
+// Write to the console! 
+// (Does not work inside of Update at the moment)
+Console.WriteLine("New Tab ${n}");`,
     };
     setTabs([...tabs(), newTab]);
     setActiveTab(idx);
@@ -304,6 +424,13 @@ void DrawEllipse(double x, double y, double radiusX, double radiusY)
   const onValueChanged = debounce((code: string) => {
     setCode(code);
   }, 1000);
+
+  const [showChangelog, setShowChangelog] = createSignal(false);
+  const changelogEntries = [
+    { version: "v0.2.0", date: "2025-11-17", notes: "Tabs with add, close, rename, persistence" },
+    { version: "v0.1.0", date: "2025-11-15", notes: "Modified JakeYallop's playground to have a Canvas API" },
+    { version: "fail", date: "2025-8-19", notes: "While trying to create a C# playground I discovered JakeYallop's repo.\nAttempted to get it working but ultimately gave up for a few months" },
+  ];
 
   // Inject the Analytics functionality
   inject({ mode: import.meta.env.DEV ? 'development' : 'production' });
@@ -380,6 +507,48 @@ void DrawEllipse(double x, double y, double radiusX, double radiusY)
         </div>
         <div style={{ display: "flex", "align-items": "center", gap: spacing(2), margin: "0 0 0 1rem" }}>
           <button onClick={addTab} title="Add tab" style={{ padding: "0.25rem 0.5rem", cursor: "pointer" }}>+</button>
+          <div
+            tabIndex={0}
+            onBlur={() => setShowChangelog(false)}
+            style={{ position: "relative", display: "inline-block" }}
+          >
+            <button
+              onClick={() => setShowChangelog((s) => !s)}
+              title="Changelog"
+              style={{ padding: "0.25rem 0.5rem", cursor: "pointer" }}
+            >
+              Changelog ▾
+            </button>
+            {showChangelog() && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "2.5rem",
+                  width: "20rem",
+                  background: "var(--card, #fff)",
+                  color: "var(--text, #000)",
+                  padding: "0.5rem",
+                  "box-shadow": "0 6px 18px rgba(0,0,0,0.12)",
+                  "border-radius": "6px",
+                  "z-index": 1000,
+                }}
+              >
+                <div style={{ "font-weight": "600", "margin-bottom": "0.25rem" }}>Changelog</div>
+                <div style={{ "max-height": "12rem", overflow: "auto" }}>
+                  {changelogEntries.map((c) => (
+                    <div style={{ padding: "0.35rem 0", "border-bottom": "1px solid rgba(0,0,0,0.06)" }}>
+                      <div style={{ "font-weight": "600" }}>{c.version} <span style={{ "font-weight": "400", color: "#666", "font-size": "0.85rem" }}>{c.date}</span></div>
+                      <div style={{ "font-size": "0.9rem", color: "#333" }}>{c.notes}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ "text-align": "right", "margin-top": "0.5rem" }}>
+                  <a target="_blank" href="https://github.com/PaperPrototype/WasmSharp/commits/main/" style={{ "font-size": "0.85rem", color: "var(--accent, #2563eb)" }}>Full changelog</a>
+                </div>
+              </div>
+            )}
+          </div>
           <a href="https://github.com/PaperPrototype/WasmSharp" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", "text-decoration": "none" }}>
             GitHub
           </a>

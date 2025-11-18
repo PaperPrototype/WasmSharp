@@ -52,6 +52,7 @@
     "@wasmsharp/vite-plugin": "workspace:*",
     "clsx": "catalog:",
     "codemirror": "catalog:",
+    "detect-zoom": "^1.0.2",
     "normalize.css": "catalog:",
     "solid-js": "catalog:"
   }

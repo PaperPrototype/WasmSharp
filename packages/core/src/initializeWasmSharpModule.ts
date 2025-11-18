@@ -4,11 +4,14 @@ import {
   type DotnetModuleConfig,
   DotnetHostBuilder,
 } from "./dotnet.js";
+import { trackPixelRatioChange } from "./pixelRatioUtil.js";
 import type {
   WasmSharpModuleOptions,
   AssemblyExports,
   WasmSharpModuleCallbacks,
 } from "./WasmCompiler.js";
+
+// import {device} from "./detectZoom.js"
 
 function getDirectory(path: string) {
   var index = path.lastIndexOf("/");
@@ -37,6 +40,17 @@ let mouseDown: (x: number, y: number) => void;
 let mouseMove: (x: number, y: number) => void;
 let updateMethod: (deltaTime: number) => void;
 let lastFrameTime = performance.now();
+
+
+let pixelRatioMethod: (pixelRatio:number) => void;
+let pixelRatio = window.devicePixelRatio; // device();
+
+trackPixelRatioChange((newRatio) => {
+  pixelRatio = newRatio ?? window.devicePixelRatio ?? 1; // device();
+  pixelRatioMethod?.(pixelRatio)
+
+  console.log('Device Pixel Ratio changed to:', newRatio);
+});
 
 function update() {
   const currentTime = performance.now();
@@ -252,12 +266,19 @@ export async function initializeWasmSharpModule(
 
   // Update loop for programs
   console.log("assemblyExports", assemblyExports)
+
+  // these only runs once when the page loads (
+  // TODO call each time "run" button is pressed
+  assemblyExports.Input.CallPixelRatio(pixelRatio);
   assemblyExports.Input.Reset();
+
+  // setup callbacks
   updateMethod = (dt: number) => {assemblyExports.Input.CallUpdate(dt)}
   mouseUp = (x:number,y:number) => {assemblyExports.Input.CallMouseUp(x, y)};
   mouseDown = (x:number,y:number) => {assemblyExports.Input.CallMouseDown(x, y)};
   mouseMove = (x:number,y:number) => {assemblyExports.Input.CallMouseMove(x, y)};
   resize = (w:number,h:number) => {assemblyExports.Input.CallResize(w, h)};
+  pixelRatioMethod = (pixelRatio:number) => {assemblyExports.Input.CallPixelRatio(pixelRatio)};
 
   const canvas = await canvasProvider() as HTMLCanvasElement;
 

@@ -105,6 +105,7 @@ export interface AssemblyExports {
     CallMouseUp: (x: number, y: number) => void,
     CallMouseMove: (x: number, y: number) => void,
     CallMouseDown: (x: number, y: number) => void,
+    CallPixelRatio: (pixelRatio: number) => void;
   }
   WasmSharp: {
     Core: {

@@ -254,6 +254,9 @@ importers:
       codemirror:
         specifier: 'catalog:'
         version: 6.0.2
+      detect-zoom:
+        specifier: ^1.0.2
+        version: 1.0.2
       normalize.css:
         specifier: 'catalog:'
         version: 8.0.1
@@ -1617,6 +1620,9 @@ packages:
 
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
+
+  detect-zoom@1.0.2:
+    resolution: {integrity: sha512-SUplZOvjM2S2zKkKrv1IrmiS1asZXXGD1dM658v2DftNmOfhbkD8nGzRJ6iIC7NfwRYLOCpv1LtigSm2A8RG7A==}
 
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -3722,6 +3728,8 @@ snapshots:
   define-lazy-prop@3.0.0: {}
 
   defu@6.1.4: {}
+
+  detect-zoom@1.0.2: {}
 
   dir-glob@3.0.1:
     dependencies:

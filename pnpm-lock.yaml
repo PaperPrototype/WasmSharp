@@ -239,6 +239,9 @@ importers:
       '@solid-primitives/scheduled':
         specifier: 'catalog:'
         version: 1.5.2(solid-js@1.9.9)
+      '@vercel/analytics':
+        specifier: ^1.5.0
+        version: 1.5.0
       '@wasmsharp/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -975,6 +978,7 @@ packages:
   '@playwright/experimental-ct-solid@1.48.2':
     resolution: {integrity: sha512-SeZT2H1ULtPbb7D6INpzLFDQ80OSGPSsOgwgjKEhE1wGxbleuaO5E24RQTotkyae0MA7Yb4SMaSfQdpRFvd/SA==}
     engines: {node: '>=18'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     hasBin: true
 
   '@polka/url@1.0.0-next.29':
@@ -1316,6 +1320,32 @@ packages:
     resolution: {integrity: sha512-Nd1worqkHrd8XED4ZAA7Wmkd3pCqCwpmzCBVF8v6T1BSLHGXQE5HYflVgygw0CsIAbFRMS6zQBIk4F4/r/YKIw==}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
+
+  '@vercel/analytics@1.5.0':
+    resolution: {integrity: sha512-MYsBzfPki4gthY5HnYN7jgInhAZ7Ac1cYDoRWFomwGHWEX7odTEzbtg9kf/QSo7XEsEAqlQugA6gJ2WS2DEa3g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
 
   '@vitejs/plugin-basic-ssl@2.1.0':
     resolution: {integrity: sha512-dOxxrhgyDIEUADhb/8OlV9JIqYLgos03YorAueTIeOUskLJSEsfwCByjbu98ctXitUN3znXKp0bYD/WHSudCeA==}
@@ -3398,6 +3428,8 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  '@vercel/analytics@1.5.0': {}
 
   '@vitejs/plugin-basic-ssl@2.1.0(vite@6.3.5(@types/node@24.0.15)(jiti@2.4.2))':
     dependencies:

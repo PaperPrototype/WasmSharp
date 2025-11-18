@@ -1,4 +1,4 @@
-import { Component, createSignal, onCleanup, onMount } from "solid-js";
+import { Component, createSignal, createEffect, onCleanup, onMount } from "solid-js";
 import { basicSetup, EditorView } from "codemirror";
 import { linter, Diagnostic as CmDiagnostic } from "@codemirror/lint";
 import { syntaxTree } from "@codemirror/language";
@@ -23,6 +23,7 @@ import { darkModern } from "./dark-theme";
 export interface CodeMirrorEditorProps {
   onValueChanged?: (value: string) => void;
   wasmSharpModule: Promise<WasmSharpModule>;
+  value?: string;
 }
 
 const CodeMirrorEditor: Component<CodeMirrorEditorProps> = (props) => {
@@ -188,6 +189,18 @@ void DrawEllipse(double x, double y, double radiusX, double radiusY)
   });
 
   onCleanup(() => editor()?.destroy());
+
+  // react to external `value` updates (e.g. when user clicks a tab)
+  createEffect(() => {
+    const v = props.value;
+    const e = editor();
+    if (v !== undefined && e) {
+      const current = e.state.doc.toString();
+      if (v !== current) {
+        e.dispatch({ changes: { from: 0, to: current.length, insert: v } });
+      }
+    }
+  });
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%", overflow: "hidden" }}>

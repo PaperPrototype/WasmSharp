@@ -11,6 +11,7 @@ public static partial class Input
     public static Action<double>? PixelRatio;
 
     public static Vector2 Mouse = new Vector2();
+    public static double DevicePixelRatio = 1;
 
     [JSExport]
     internal static void CallMouseUp(double x, double y)
@@ -48,6 +49,7 @@ public static partial class Input
     [JSExport]
     internal static void CallPixelRatio(double pixelRatio)
     {
+        DevicePixelRatio = pixelRatio;
         PixelRatio?.Invoke(pixelRatio);
     }
 

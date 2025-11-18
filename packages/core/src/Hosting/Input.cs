@@ -12,6 +12,8 @@ public static partial class Input
 
     public static Vector2 Mouse = new Vector2();
     public static double DevicePixelRatio = 1;
+    public static double Width = 1;
+    public static double Height = 1;
 
     [JSExport]
     internal static void CallMouseUp(double x, double y)
@@ -43,6 +45,8 @@ public static partial class Input
     [JSExport]
     internal static void CallResize(double width, double height)
     {
+        Width = (float)width;
+        Height = (float)height;
         Resize?.Invoke(width, height);
     }
 

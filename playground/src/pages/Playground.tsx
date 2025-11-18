@@ -173,6 +173,7 @@ Context2D.FillRect(10, 10, 120, 60);
 // -------------------------
 // 2) Path drawing (triangle)
 // -------------------------
+Context2D.Reset();
 Context2D.BeginPath();
 Context2D.MoveTo(80, 30);
 Context2D.LineTo(30, 100);
@@ -182,10 +183,35 @@ Context2D.FillStyle("#ffcc00");
 Context2D.Fill();
 
 // -------------------------
-// 3) Helper: draw a circle
+// 3) Input callbacks and Update loop
 // -------------------------
+// The Update callback runs once per frame with a delta time.
+// IMPORTANT: When switching tabs, set Input.Update = null to stop prior loops.
+var xPos = 200.0;
+var yPos = 120.0;
+
+Input.Update = (double deltaTimeSeconds) => {
+  // Clear previous frame
+  Context2D.Reset();
+
+  // Input.Mouse contains mouse position in X and Y
+  xPos = Input.Mouse.X;
+  yPos = Input.Mouse.Y;
+
+  // Draw a moving circle at the mouse position
+  Context2D.FillStyle("#4caf50");
+  DrawCircle(xPos, yPos, 24);
+};
+
+// -------------------------
+// 4) Helper: draw a circle
+// -------------------------
+Context2D.FillStyle("#d32f2f");
+DrawCircle(200, 60, 36);
+
 void DrawCircle(double x, double y, double radius)
 {
+  Context2D.BeginPath();
   var segments = 32;
   for (int i = 0; i <= segments; i++)
   {
@@ -198,40 +224,15 @@ void DrawCircle(double x, double y, double radius)
       Context2D.LineTo(px, py);
   }
   Context2D.ClosePath();
+  Context2D.Fill();
 }
 
-Context2D.BeginPath();
-DrawCircle(200, 60, 36);
-Context2D.FillStyle("#d32f2f");
-Context2D.Fill();
-
 // -------------------------
-// 4) Input callbacks and Update loop
+// 5) Rest of the Input API
 // -------------------------
-// The Update callback runs once per frame with a delta time.
-// IMPORTANT: When switching tabs, set Input.Update = null to stop prior loops.
-double xPos = 200.0;
-double yPos = 120.0;
-
-Input.MouseMove = (double mx, double my) => {
-  xPos = mx;
-  yPos = my;
-};
-
-Input.Update = (double deltaTimeSeconds) => {
-  // Clear previous frame
-  Context2D.Reset();
-
-  // Draw a moving circle at the mouse position
-  Context2D.BeginPath();
-  DrawCircle(xPos, yPos, 24);
-  Context2D.FillStyle("#4caf50");
-  Context2D.Fill();
-};
-
-// -------------------------
-// 5) Other hooks
-// -------------------------
+var canvasWidth = Input.Width; // the width of the canvas
+var canvasHeight = Input.Height; // the height of the canvas
+Input.MouseMove = (double mx, double my) => { /* handle mouse movement */ };
 Input.MouseDown = (double mx, double my) => { /* handle mouse down */ };
 Input.MouseUp = (double mx, double my) => { /* handle mouse up */ };
 Input.Resize = (double w, double h) => { /* handle host resize */ };
@@ -420,7 +421,7 @@ Console.WriteLine("New Tab ${n}");`,
 
   const [showChangelog, setShowChangelog] = createSignal(false);
   const changelogEntries = [
-    { version: "v0.2.1", date: "2025-11-17", notes: "Added Width, Height, and DevicePixelRatio to Input API" },
+    { version: "v0.2.1", date: "2025-11-18", notes: "Added Width, Height, and DevicePixelRatio to Input API" },
     { version: "v0.2.0", date: "2025-11-17", notes: "Added persistent tabs, fully working Context2D API, as well as Input API with update loop and mouse input via Input.Update and Input.Mouse" },
     { version: "v0.1.0", date: "2025-11-15", notes: "Successfully modified JakeYallop's playground to have a Canvas API" },
     { version: "fail", date: "2025-8-19", notes: "While trying to create a C# playground I discovered JakeYallop's repo.\nAttempted to get it working but ultimately gave up for a few months" },

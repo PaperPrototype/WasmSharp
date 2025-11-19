@@ -13,6 +13,13 @@ import * as styles from "./Playground.css";
 import { inject } from "@vercel/analytics"
 
 const Playground: Component = () => {
+  const LATEST_VERSION = "v0.2.2"; // Update this when you add new versions
+  const VERSION_STORAGE_KEY = "wasmsharp.playground.lastSeenVersion";
+
+  const [showNewVersionNotification, setShowNewVersionNotification] = createSignal(false);
+  const [lastSeenVersion, setLastSeenVersion] = createSignal<string | null>(null);
+  const [hasUnreadVersions, setHasUnreadVersions] = createSignal(false);
+
   let canvasRef: HTMLCanvasElement | undefined;
 
   const initialTabs = [
@@ -25,7 +32,7 @@ Console.WriteLine("Angry Bird is ready!");
 
 var PI = 3.14159;
 
-Input.Update = (dt) => {
+Screen.Update = (dt) => {
   Context2D.Reset();
 
   // blue background
@@ -190,7 +197,7 @@ Context2D.Fill();
 var xPos = 200.0;
 var yPos = 120.0;
 
-Input.Update = (double deltaTimeSeconds) => {
+Screen.Update = (double deltaTimeSeconds) => {
   // Clear previous frame
   Context2D.Reset();
 
@@ -230,13 +237,13 @@ void DrawCircle(double x, double y, double radius)
 // -------------------------
 // 5) Rest of the Input API
 // -------------------------
-var canvasWidth = Input.Width; // the width of the canvas
-var canvasHeight = Input.Height; // the height of the canvas
+var canvasWidth = Screen.Width; // the width of the canvas
+var canvasHeight = Screen.Height; // the height of the canvas
 Input.MouseMove = (double mx, double my) => { /* handle mouse movement */ };
-Input.MouseDown = (double mx, double my) => { /* handle mouse down */ };
-Input.MouseUp = (double mx, double my) => { /* handle mouse up */ };
-Input.Resize = (double w, double h) => { /* handle host resize */ };
-Input.PixelRatio = (double pr) => { /* handle device pixel ratio changes */ };
+Input.MouseDown = (int button) => { /* handle mouse down */ };
+Input.MouseUp = (int button) => { /* handle mouse up */ };
+Screen.Resize = (double w, double h) => { /* handle host resize */ };
+Screen.PixelRatio = (double pr) => { /* handle device pixel ratio changes */ };
 
 // -------------------------
 // Final notes / edge cases
@@ -315,6 +322,21 @@ Console.WriteLine("Hello world!");`
       }
     } catch (e) {
       console.warn("Failed to load tabs from localStorage", e);
+    }
+
+    try {
+      const seen = localStorage.getItem(VERSION_STORAGE_KEY);
+      setLastSeenVersion(seen);
+      const hasNew = seen !== LATEST_VERSION;
+      setHasUnreadVersions(hasNew);
+      
+      // Show notification if there's a new version
+      if (hasNew) {
+        // Delay slightly so it appears after page load
+        setTimeout(() => setShowNewVersionNotification(true), 500);
+      }
+    } catch (e) {
+      console.warn("Failed to load version tracking", e);
     }
   });
 
@@ -421,6 +443,7 @@ Console.WriteLine("New Tab ${n}");`,
 
   const [showChangelog, setShowChangelog] = createSignal(false);
   const changelogEntries = [
+    { version: "v0.2.2", date: "2025-11-19", notes: "Breaking changes! Input.MouseUp and Input.MouseDown now provides the button pressed that triggered the event (eg. right click, left click, middle click).\nAlso moved Width, Height, PixelRatio, Update, Resize, and DevicePixelRatio to global Screen class (eg. Screen.Width)" },
     { version: "v0.2.1", date: "2025-11-18", notes: "Added Width, Height, MouseDelta, and DevicePixelRatio to Input API" },
     { version: "v0.2.0", date: "2025-11-17", notes: "Added persistent tabs, fully working Context2D API, as well as Input API with update loop and mouse input via Input.Update and Input.Mouse" },
     { version: "v0.1.0", date: "2025-11-15", notes: "Successfully modified JakeYallop's playground to have a Canvas API" },
@@ -513,7 +536,84 @@ Console.WriteLine("New Tab ${n}");`,
               style={{ padding: "0.25rem 0.5rem", cursor: "pointer" }}
             >
               Changelog ▾
+                
+            {hasUnreadVersions() && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "0",
+                  right: "0",
+                  width: "8px",
+                  height: "8px",
+                  background: "#ef4444",
+                  "border-radius": "50%",
+                  border: "2px solid var(--background, #1e1e1e)"
+                }}
+                title="New version available"
+              />
+            )}
             </button>
+
+            {/* New Version Notification Tooltip */}
+            {showNewVersionNotification() && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "2.5rem",
+                  width: "16rem",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  padding: "0.75rem",
+                  "box-shadow": "0 10px 25px rgba(102, 126, 234, 0.3)",
+                  "border-radius": "8px",
+                  "z-index": 1001,
+                  animation: "slideDown 0.3s ease-out"
+                }}
+              >
+                <div style={{ display: "flex", "justify-content": "space-between", "align-items": "start" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ "font-weight": "700", "font-size": "0.95rem", "margin-bottom": "0.25rem" }}>
+                      🎉 New Update Available!
+                    </div>
+                    <div style={{ "font-size": "0.85rem", opacity: "0.95", "line-height": "1.4" }}>
+                      Version {LATEST_VERSION} is here. Click to see what's new!
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowNewVersionNotification(false);
+                    }}
+                    style={{
+                      background: "rgba(255,255,255,0.2)",
+                      border: "none",
+                      color: "white",
+                      cursor: "pointer",
+                      padding: "0.15rem 0.4rem",
+                      "border-radius": "4px",
+                      "font-size": "0.9rem",
+                      "margin-left": "0.5rem"
+                    }}
+                    title="Dismiss"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div style={{ 
+                  position: "absolute", 
+                  top: "-6px", 
+                  right: "1rem", 
+                  width: 0, 
+                  height: 0,
+                  "border-left": "6px solid transparent",
+                  "border-right": "6px solid transparent",
+                  "border-bottom": "6px solid #667eea"
+                }} />
+              </div>
+            )}
+
+            {/* Original Changelog Dropdown */}
             {showChangelog() && (
               <div
                 style={{

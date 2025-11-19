@@ -3,30 +3,24 @@ using System.Runtime.InteropServices.JavaScript;
 
 public static partial class Input
 {
-    public static Action<double, double>? MouseDown;
+    public static Action<int>? MouseUp;
+    public static Action<int>? MouseDown;
     public static Action<double, double>? MouseMove;
-    public static Action<double, double>? MouseUp;
-    public static Action<double, double>? Resize;
-    public static Action<double>? Update;
-    public static Action<double>? PixelRatio;
 
     private static Vector2 _prevMouse = new Vector2();
     public static Vector2 Mouse = new Vector2();
     public static Vector2 MouseDelta = new Vector2();
-    public static double DevicePixelRatio = 1;
-    public static double Width = 1;
-    public static double Height = 1;
 
     [JSExport]
-    internal static void CallMouseUp(double x, double y)
+    internal static void CallMouseUp(int button)
     {
-        MouseUp?.Invoke(x, y);
+        MouseUp?.Invoke(button);
     }
 
     [JSExport]
-    internal static void CallMouseDown(double x, double y)
+    internal static void CallMouseDown(int button)
     {
-        MouseDown?.Invoke(x, y);
+        MouseDown?.Invoke(button);
     }
 
     [JSExport]
@@ -44,33 +38,10 @@ public static partial class Input
     }
 
     [JSExport]
-    internal static void CallUpdate(double deltaTime)
-    {
-        Update?.Invoke(deltaTime);
-    }
-
-    [JSExport]
-    internal static void CallResize(double width, double height)
-    {
-        Width = (float)width;
-        Height = (float)height;
-        Resize?.Invoke(width, height);
-    }
-
-    [JSExport]
-    internal static void CallPixelRatio(double pixelRatio)
-    {
-        DevicePixelRatio = pixelRatio;
-        PixelRatio?.Invoke(pixelRatio);
-    }
-
-    [JSExport]
     internal static void Reset()
     {
         MouseDown = null;
         MouseMove = null;
         MouseUp = null;
-        Update = null;
-        Resize = null;
     }
 }

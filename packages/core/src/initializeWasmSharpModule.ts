@@ -35,8 +35,8 @@ function getMousePos(canvas: HTMLCanvasElement, evt: MouseEvent): { x: number; y
 }
 
 let resize: (w:number,h:number) => void;
-let mouseUp:   (x: number, y: number) => void;
-let mouseDown: (x: number, y: number) => void;
+let mouseUp:   (button: number) => void;
+let mouseDown: (button: number) => void;
 let mouseMove: (x: number, y: number) => void;
 let updateMethod: (deltaTime: number) => void;
 let lastFrameTime = performance.now();
@@ -269,27 +269,25 @@ export async function initializeWasmSharpModule(
 
   // these only runs once when the page loads (
   // TODO call each time "run" button is pressed
-  assemblyExports.Input.CallPixelRatio(pixelRatio);
+  assemblyExports.Screen.CallPixelRatio(pixelRatio);
   assemblyExports.Input.Reset();
 
   // setup callbacks
-  updateMethod = (dt: number) => {assemblyExports.Input.CallUpdate(dt)}
-  mouseUp = (x:number,y:number) => {assemblyExports.Input.CallMouseUp(x, y)};
-  mouseDown = (x:number,y:number) => {assemblyExports.Input.CallMouseDown(x, y)};
-  mouseMove = (x:number,y:number) => {assemblyExports.Input.CallMouseMove(x, y)};
-  resize = (w:number,h:number) => {assemblyExports.Input.CallResize(w, h)};
-  pixelRatioMethod = (pixelRatio:number) => {assemblyExports.Input.CallPixelRatio(pixelRatio)};
+  updateMethod     = (dt: number)           => {assemblyExports.Screen.CallUpdate(dt)}
+  resize           = (w: number, h: number) => {assemblyExports.Screen.CallResize(w, h)};
+  pixelRatioMethod = (pixelRatio: number)   => {assemblyExports.Screen.CallPixelRatio(pixelRatio)};
+  mouseUp   = (button: number)       => {assemblyExports.Input.CallMouseUp(button)};
+  mouseDown = (button: number)       => {assemblyExports.Input.CallMouseDown(button)};
+  mouseMove = (x: number, y: number) => {assemblyExports.Input.CallMouseMove(x, y)};
 
   const canvas = await canvasProvider() as HTMLCanvasElement;
 
   // bind the input events
   canvas.addEventListener('mouseup', (e) => {
-    const {x, y} = getMousePos(options?.canvas()!, e);
-    mouseUp(x, y);
+    mouseUp(e.button);
   });
   canvas.addEventListener('mousedown', (e) => {
-    const {x, y} = getMousePos(options?.canvas()!, e);
-    mouseDown(x, y);
+    mouseDown(e.button);
   });
   canvas.addEventListener('mousemove', (e) => {
     const {x, y} = getMousePos(options?.canvas()!, e);

@@ -100,11 +100,13 @@ export type CompletionItem = {
 export interface AssemblyExports {
   Input: {
     Reset: () => void;
+    CallMouseUp: (button: number) => void,
+    CallMouseDown: (button: number) => void,
+    CallMouseMove: (x: number, y: number) => void,
+  }
+  Screen: {
     CallUpdate: (deltaTime: number) => void,
     CallResize: (w: number, h: number) => void,
-    CallMouseUp: (x: number, y: number) => void,
-    CallMouseMove: (x: number, y: number) => void,
-    CallMouseDown: (x: number, y: number) => void,
     CallPixelRatio: (pixelRatio: number) => void;
   }
   WasmSharp: {

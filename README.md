@@ -8,4 +8,5 @@ C# playground for drawing things to a canvas. Runs locally from your web browser
 https://sharptoy.net/
 
 > [!NOTE]
-> This is a modified version of Jake Yallop's WasmSharp playground that adds an `Input` and `Context2D` API along with an HTML Canvas for creating mini-games / learning C#.
+> No effort has gone into design or theming.
+> This is a recently forked version of Jake Yallop's WasmSharp playground that adds an `Input`, `Context2D`, and `Screen` API for making interactive C# programs on the web.
